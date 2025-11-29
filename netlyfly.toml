@@ -1,0 +1,12 @@
+[build]
+  # Confirma el comando de construcción y la carpeta de salida
+  command = "npm run build"
+  publish = "dist/come-ya/browser" 
+
+[[redirects]]
+  # Le dice a Netlify que para cualquier ruta (/*)...
+  from = "/*"
+  # ...redirija al archivo index.html...
+  to = "/index.html"
+  # ...y mantenga el código de estado HTTP 200 (éxito).
+  status = 200
