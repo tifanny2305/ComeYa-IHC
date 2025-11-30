@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import * as L from 'leaflet';
 import { CarritoService } from '../../services/carrito.service';
 import { TelegramService } from '../../services/telegram.service'; // Asegúrate de tener este servicio
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-mapa',
@@ -18,6 +19,7 @@ export class MapaComponent implements OnInit {
   private marker: any;
   carritoService = inject(CarritoService);
   telegramService = inject(TelegramService); // Servicio para cerrar la app y enviar datos
+  router = inject(Router);
 
   // Guardamos la ubicación actual
   ubicacion = { lat: -17.7833, lng: -63.1821 };
@@ -72,5 +74,8 @@ export class MapaComponent implements OnInit {
     // Esto hace que aparezca en el chat "Datos enviados" (mensaje de servicio)
     // Y tu backend recibe el evento automáticamente.
     this.telegramService.sendData(datosParaBackend);
+
+    // Redirigir al menú después de confirmar la ubicación
+    this.router.navigate(['/menu']);
   }
 }
