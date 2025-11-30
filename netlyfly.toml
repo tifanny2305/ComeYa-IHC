@@ -4,9 +4,8 @@
   publish = "dist/come-ya/browser" 
 
 [[redirects]]
-  # Le dice a Netlify que para cualquier ruta (/*)...
+  # Redirige todas las rutas al archivo index.html
   from = "/*"
-  # ...redirija al archivo index.html...
   to = "/index.html"
-  # ...y mantenga el código de estado HTTP 200 (éxito).
   status = 200
+  force = true
