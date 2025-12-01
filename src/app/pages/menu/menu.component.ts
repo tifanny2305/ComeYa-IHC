@@ -1,92 +1,63 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Importante para usar *ngFor o @for
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Producto } from '../../models/producto.model';
 import { CarritoService } from '../../services/carrito.service';
+import { ApiService } from '../../services/api.service';
+import { Plato, Categoria } from '../../models/producto.model';
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule], // Asegúrate de tener esto
+  imports: [CommonModule, RouterModule],
   templateUrl: './menu.component.html',
-  styleUrl: './menu.component.scss' // O .css según tengas
+  styleUrl: './menu.component.scss' 
 })
-export class MenuComponent {
-  carritoService = inject(CarritoService);
-  categoriaActual: string = 'hamburguesas';
+export class MenuComponent implements OnInit {
+  public carritoService = inject(CarritoService);
+  private api = inject(ApiService);
 
-  // DATOS COMPLETOS
-  productos: Producto[] = [
-    // HAMBURGUESAS
-    {
-      id: 1,
-      nombre: 'Hamburguesa Clásica',
-      precio: 50,
-      imagen: 'https://cdn-icons-png.flaticon.com/512/3075/3075977.png',
-      categoria: 'hamburguesas'
-    },
-    {
-      id: 2,
-      nombre: 'Royal Doble Carne',
-      precio: 75,
-      imagen: 'https://cdn-icons-png.flaticon.com/512/3075/3075977.png', // Puedes buscar otro icono si quieres
-      categoria: 'hamburguesas'
-    },
-    {
-      id: 3,
-      nombre: 'Chicken Crispy',
-      precio: 45,
-      imagen: 'https://cdn-icons-png.flaticon.com/512/3075/3075977.png',
-      categoria: 'hamburguesas'
-    },
-    
-    // PIZZAS
-    {
-      id: 4,
-      nombre: 'Pizza Pepperoni',
-      precio: 80,
-      imagen: 'https://cdn-icons-png.flaticon.com/512/1404/1404945.png',
-      categoria: 'pizzas'
-    },
-    {
-      id: 5,
-      nombre: 'Pizza Hawaiana',
-      precio: 70,
-      imagen: 'https://cdn-icons-png.flaticon.com/512/1404/1404945.png',
-      categoria: 'pizzas'
-    },
+  // 1. Convertimos todo a Signals para reactividad perfecta
+  categorias = signal<Categoria[]>([]);
+  productos = signal<Plato[]>([]);
+  categoriaActualId = signal<number>(0);
 
-    // BEBIDAS
-    {
-      id: 6,
-      nombre: 'Coca Cola 2L',
-      precio: 15,
-      imagen: 'https://cdn-icons-png.flaticon.com/512/2405/2405597.png',
-      categoria: 'bebidas'
-    },
-    {
-      id: 7,
-      nombre: 'Limonada Frozen',
-      precio: 20,
-      imagen: 'https://cdn-icons-png.flaticon.com/512/2442/2442019.png',
-      categoria: 'bebidas'
-    },
+  // 2. Computed: Se recalcula automáticamente si cambia productos O la categoría
+  productosFiltrados = computed(() => {
+    const catId = this.categoriaActualId();
+    const listaProductos = this.productos();
 
-    // ENSALADAS
-    {
-      id: 8,
-      nombre: 'Ensalada César',
-      precio: 40,
-      imagen: 'https://cdn-icons-png.flaticon.com/512/2515/2515183.png',
-      categoria: 'ensaladas'
-    }
-  ];
+    if (catId === 0) return listaProductos;
+    return listaProductos.filter(p => p.categoria_id === catId);
+  });
 
-  get productosFiltrados() {
-    return this.productos.filter(p => p.categoria === this.categoriaActual);
+  ngOnInit() {
+    this.cargarDatos();
   }
 
-  cambiarCategoria(cat: string) {
-    this.categoriaActual = cat;
+  cargarDatos() {
+    // Cargar Categorías
+    this.api.getCategorias().subscribe({
+      next: (cats) => {
+        this.categorias.set(cats);
+        // Si hay categorías, seleccionamos la primera automáticamente
+        if (cats.length > 0) {
+          this.categoriaActualId.set(cats[0].id);
+        }
+      },
+      error: (err) => console.error('Error cargando categorías:', err)
+    });
+
+    // Cargar Platos
+    this.api.getPlatos().subscribe({
+      next: (platos) => {
+        console.log('Platos cargados:', platos); // Para depurar
+        this.productos.set(platos);
+      },
+      error: (err) => console.error('Error cargando platos:', err)
+    });
+  }
+
+  cambiarCategoria(catId: number) {
+    this.categoriaActualId.set(catId);
   }
 }
