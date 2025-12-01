@@ -8,7 +8,7 @@ import { Categoria, Plato, UsuarioCreate, PedidoCreate, DetalleCreate } from '..
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://34.176.223.70'; 
+  private apiUrl = '/api'; 
 
   // --- USUARIOS ---
   registrarUsuario(usuario: UsuarioCreate): Observable<any> {
