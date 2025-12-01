@@ -15,7 +15,8 @@
         <div *ngFor="let item of carritoService.items()" class="flex gap-4">
             <div class="flex flex-col items-center gap-2">
                 <!-- Imagen con fallback por si es null -->
-                <img [src]="item.producto.imagen || 'assets/placeholder.png'" class="w-20 h-20 rounded-lg object-cover shadow-sm bg-gray-100">
+                <img [src]="item.producto.url_imagen || 'assets/placeholder.png'"
+                    class="w-20 h-20 rounded-lg object-cover shadow-sm bg-gray-100">
                 <div class="font-bold text-sm">Bs {{ item.producto.precio_venta }}</div>
             </div>
 
@@ -24,9 +25,10 @@
 
                 <!-- Input observación -->
                 <div class="bg-gray-100 rounded-lg p-2">
-                    <textarea [(ngModel)]="item.cantidad" hidden></textarea> <!-- Hack para binding -->
-                    <textarea placeholder="¿Alguna nota? Ej: Sin cebolla"
-                        class="w-full bg-transparent text-sm text-gray-700 outline-none resize-none h-8 placeholder-gray-400"></textarea>
+                    <textarea [(ngModel)]="item.cantidad" hidden></textarea>
+                    <textarea [(ngModel)]="item.observacion" placeholder="¿Alguna nota? Ej: Sin cebolla"
+                        class="w-full bg-transparent text-sm text-gray-700 outline-none resize-none h-8 placeholder-gray-400">
+                    </textarea>
                 </div>
 
                 <div class="flex justify-between items-center mt-1">
@@ -52,9 +54,12 @@
         <button routerLink="/mapa"
             class="w-full bg-brand-green text-white text-lg font-bold py-4 rounded-xl shadow-lg hover:bg-green-600 transition flex justify-between px-6 items-center">
             <span>Seleccionar Ubicación</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
         </button>
     </div>

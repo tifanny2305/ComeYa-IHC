@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, switchMap, map, catchError, of } from 'rxjs';
-import { Categoria, Plato, UsuarioCreate, PedidoCreate, DetalleCreate } from '../models/producto.model';
+import { Categoria, Plato, PedidoCreate, DetalleCreate } from '../models/producto.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,22 +9,6 @@ import { Categoria, Plato, UsuarioCreate, PedidoCreate, DetalleCreate } from '..
 export class ApiService {
   private http = inject(HttpClient);
   private apiUrl = '/api'; 
-
-  // --- USUARIOS ---
-  registrarUsuario(usuario: UsuarioCreate): Observable<any> {
-    return this.http.post(`${this.apiUrl}/usuarios/`, usuario).pipe(
-      catchError(err => {
-        console.warn('Posible usuario duplicado, buscando existente...', err);
-        return this.getUsuarios().pipe(
-          map(users => users.find((u: any) => u.user_id == usuario.user_id))
-        );
-      })
-    );
-  }
-
-  getUsuarios(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/usuarios/`);
-  }
 
   // --- MENÚ ---
   getCategorias(): Observable<Categoria[]> {
@@ -44,13 +28,14 @@ export class ApiService {
         const pedidoId = pedidoCreado.id; 
         
         // Crear detalles usando el ID del pedido
-        const peticionesDetalles = items.map(item => {
+        const peticionesDetalles = items.map((item: Partial<DetalleCreate>) => {
           const detalle: DetalleCreate = {
             pedido_id: pedidoId,
-            plato_id: item.plato_id,
-            cantidad: item.cantidad
+            plato_id: item.plato_id!,
+            cantidad: item.cantidad!,
+            observacion: item.observacion || ''
           };
-          return this.http.post(`${this.apiUrl}/detalles/`, detalle);
+          return this.http.post<any>(`${this.apiUrl}/detalles/`, detalle);
         });
 
         // Ejecutar todas las creaciones de detalles

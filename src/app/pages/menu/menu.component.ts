@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { CarritoService } from '../../services/carrito.service';
 import { ApiService } from '../../services/api.service';
 import { Plato, Categoria } from '../../models/producto.model';
@@ -15,13 +15,12 @@ import { Plato, Categoria } from '../../models/producto.model';
 export class MenuComponent implements OnInit {
   public carritoService = inject(CarritoService);
   private api = inject(ApiService);
+  private route = inject(ActivatedRoute); 
 
-  // 1. Convertimos todo a Signals para reactividad perfecta
   categorias = signal<Categoria[]>([]);
   productos = signal<Plato[]>([]);
   categoriaActualId = signal<number>(0);
 
-  // 2. Computed: Se recalcula automáticamente si cambia productos O la categoría
   productosFiltrados = computed(() => {
     const catId = this.categoriaActualId();
     const listaProductos = this.productos();
@@ -32,14 +31,29 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() {
     this.cargarDatos();
+    this.capturarParametrosDeUrl(); 
+  }
+
+  capturarParametrosDeUrl(): void {
+    this.route.queryParams.subscribe(params => {
+      const chatId = params['chat_id'];
+      const nombreUsuario = params['nombre_usuario'];
+
+      if (chatId) {
+        localStorage.setItem('chat_id', chatId);
+        console.log('Chat ID de la URL capturado y guardado:', chatId);
+      }
+      if (nombreUsuario) {
+        localStorage.setItem('nombre_usuario', nombreUsuario);
+        console.log('Nombre de Usuario de la URL capturado y guardado:', nombreUsuario);
+      }
+    });
   }
 
   cargarDatos() {
-    // Cargar Categorías
     this.api.getCategorias().subscribe({
       next: (cats) => {
         this.categorias.set(cats);
-        // Si hay categorías, seleccionamos la primera automáticamente
         if (cats.length > 0) {
           this.categoriaActualId.set(cats[0].id);
         }
