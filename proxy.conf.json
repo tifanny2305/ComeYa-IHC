@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://34.176.223.70",
+    "target": "https://14c99415aa88.ngrok-free.app",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {

@@ -22,6 +22,7 @@ export class PagoComponent implements OnInit {
 
   precioDelivery = 0;
   totalFinalMostrado = signal(0);
+  deliveryDisponible = true;
   private deliveryId = 0;
   coordenadas = '-17.7833, -63.1821';
 
@@ -30,18 +31,31 @@ export class PagoComponent implements OnInit {
     const lng = localStorage.getItem('delivery_lng');
     if (lat && lng) this.coordenadas = `${lat}, ${lng}`;
 
+    this.cargarDelivery();
+  }
+
+  private cargarDelivery() {
     this.api.getDeliveryMasCercano().pipe(
-      tap(d => this.deliveryId = d.id),
+      tap(d => {
+        this.deliveryId = d.id;
+        this.deliveryDisponible = true;
+      }),
       switchMap(() => this.api.calcularTarifaDelivery(this.coordenadas)),
       tap(t => {
         this.precioDelivery = t;
         this.totalFinalMostrado.set(this.carritoService.totalPagar() + t);
       }),
-      catchError(() => {
+      catchError(err => {
+        this.deliveryDisponible = false;
         this.totalFinalMostrado.set(this.carritoService.totalPagar());
+        alert('⚠️ Lo sentimos, no hay repartidores disponibles en este momento.');
         return of(null);
       })
     ).subscribe();
+  }
+
+  reintentar() {
+    this.cargarDelivery();
   }
 
   procesarPedido(): void {

@@ -40,8 +40,18 @@
   </div>
 
   <div class="p-4 border-t border-gray-100">
+    <div *ngIf="!deliveryDisponible" class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3 text-center">
+      <p class="text-yellow-800 text-sm font-medium">⚠️ No hay repartidores disponibles</p>
+      <button (click)="reintentar()" class="mt-2 text-blue-600 text-sm font-semibold underline">
+        Reintentar
+      </button>
+    </div>
+    
     <button (click)="procesarPedido()"
-      class="w-full bg-brand-green text-white font-bold py-3 rounded-xl shadow-lg transition transform active:scale-95">
+      [disabled]="!deliveryDisponible"
+      [class.opacity-50]="!deliveryDisponible"
+      [class.cursor-not-allowed]="!deliveryDisponible"
+      class="w-full bg-brand-green text-white font-bold py-3 rounded-xl shadow-lg transition transform active:scale-95 disabled:active:scale-100">
       Verificar Pago y Enviar
     </button>
   </div>
