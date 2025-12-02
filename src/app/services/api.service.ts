@@ -1,7 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, switchMap, map, catchError, of } from 'rxjs';
-import { Categoria, Plato, PedidoCreate, DetalleCreate } from '../models/producto.model';
+import { Observable, catchError, of } from 'rxjs';
+import { PedidoCreate } from '../models/producto.model';
+
+// INTERFAZ MOVIDA FUERA DE LA CLASE
+interface DetalleInput {
+  plato_id: number;
+  cantidad: number;
+  observacion: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,37 +18,39 @@ export class ApiService {
   private apiUrl = '/api'; 
 
   // --- MENÚ ---
-  getCategorias(): Observable<Categoria[]> {
-    return this.http.get<Categoria[]>(`${this.apiUrl}/categorias/`);
+  getCategorias(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/categorias/`);
   }
 
-  getPlatos(): Observable<Plato[]> {
-    return this.http.get<Plato[]>(`${this.apiUrl}/platos/`);
+  getPlatos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/platos/`);
   }
 
   // --- PEDIDOS ---
-  crearPedidoCompleto(pedido: PedidoCreate, items: { plato_id: number, cantidad: number }[]): Observable<any> {
+  crearPedidoCompleto(pedido: PedidoCreate, items: DetalleInput[]): Observable<any> {
     
-    // Crear cabecera del pedido
-    return this.http.post<any>(`${this.apiUrl}/pedidos/`, pedido).pipe(
-      switchMap((pedidoCreado) => {
-        const pedidoId = pedidoCreado.id; 
-        
-        // Crear detalles usando el ID del pedido
-        const peticionesDetalles = items.map((item: Partial<DetalleCreate>) => {
-          const detalle: DetalleCreate = {
-            pedido_id: pedidoId,
-            plato_id: item.plato_id!,
-            cantidad: item.cantidad!,
-            observacion: item.observacion || ''
-          };
-          return this.http.post<any>(`${this.apiUrl}/detalles/`, detalle);
-        });
+    // 2. Unir la cabecera y los detalles en el objeto final (Payload)
+    const detallesMapeados = items.map(item => ({
+        plato_id: item.plato_id,
+        cantidad: item.cantidad,
+        observacion: item.observacion
+    }));
 
-        // Ejecutar todas las creaciones de detalles
-        return forkJoin(peticionesDetalles).pipe(
-          map(() => pedidoCreado) 
-        );
+    const pedidoCompletoPayload = {
+      ...pedido, // <-- SINTAXIS CORRECTA para incluir chat_id, total, etc.
+      detalles: detallesMapeados
+    };
+    
+    // 3. Endpoint corregido a /pedidos/completo
+    const endpoint = `${this.apiUrl}/pedidos/completo`; 
+    
+    console.log(`[API] Enviando POST a: ${endpoint}`);
+    console.log('[API] PAYLOAD COMPLETO:', pedidoCompletoPayload);
+
+    return this.http.post<any>(endpoint, pedidoCompletoPayload).pipe(
+      catchError(error => {
+        console.error('❌ Error al crear el pedido completo:', error);
+        return of({ error: true, message: 'Fallo en la API al crear pedido completo', details: error });
       })
     );
   }
