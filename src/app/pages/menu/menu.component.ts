@@ -17,6 +17,9 @@ export class MenuComponent implements OnInit {
   private api = inject(ApiService);
   private route = inject(ActivatedRoute); 
 
+  public displayChatId = signal<string>('Cargando...');
+  public displayNombreUsuario = signal<string>('Cargando...');
+
   categorias = signal<Categoria[]>([]);
   productos = signal<Plato[]>([]);
   categoriaActualId = signal<number>(0);
@@ -41,11 +44,16 @@ export class MenuComponent implements OnInit {
 
       if (chatId) {
         localStorage.setItem('chat_id', chatId);
-        console.log('Chat ID de la URL capturado y guardado:', chatId);
+        this.displayChatId.set(chatId); // <--- ACTUALIZAR EL SIGNAL
+      } else {
+        this.displayChatId.set('ID No Encontrado');
       }
+      
       if (nombreUsuario) {
         localStorage.setItem('nombre_usuario', nombreUsuario);
-        console.log('Nombre de Usuario de la URL capturado y guardado:', nombreUsuario);
+        this.displayNombreUsuario.set(nombreUsuario); // <--- ACTUALIZAR EL SIGNAL
+      } else {
+        this.displayNombreUsuario.set('Nombre No Encontrado');
       }
     });
   }
