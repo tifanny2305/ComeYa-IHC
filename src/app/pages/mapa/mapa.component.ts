@@ -18,10 +18,10 @@ export class MapaComponent implements OnInit {
   
   cargando: boolean = false;
 
-  // 1. UBICACIÓN FIJA (RESTAURANTE)
+  // UBICACIÓN FIJA (RESTAURANTE)
   restauranteUbicacion = { lat: -17.7833, lng: -63.1821 };
 
-  // 2. UBICACIÓN MÓVIL (CLIENTE - Default)
+  // UBICACIÓN MÓVIL
   clienteUbicacion = { lat: -17.7840, lng: -63.1830 };
 
   ngOnInit(): void {
@@ -108,7 +108,7 @@ export class MapaComponent implements OnInit {
         console.error(error);
         alert('No pudimos acceder a tu ubicación. Por favor revisa los permisos.');
       },
-      { enableHighAccuracy: true } // Pedir máxima precisión al GPS
+      { enableHighAccuracy: true }
     );
   }
 
@@ -118,7 +118,7 @@ export class MapaComponent implements OnInit {
     this.cargando = true;
 
     try {
-      // TRUCO: Concatenamos "Santa Cruz de la Sierra" para forzar el contexto
+      // "Santa Cruz de la Sierra" para forzar el contexto
       const queryContextualizado = `${query}, Santa Cruz de la Sierra`;
 
       // countrycodes=bo: Limita a Bolivia
@@ -131,20 +131,16 @@ export class MapaComponent implements OnInit {
         const result = data[0];
         this.moverPin(parseFloat(result.lat), parseFloat(result.lon));
       } else {
-        // Intento secundario: Si falló, buscar sin agregar "Santa Cruz" pero manteniendo el país
         this.buscarDireccionGlobal(query);
       }
     } catch (error) {
       console.error(error);
       this.cargando = false;
     } finally {
-      // El loading se apaga en el catch o en el segundo intento, 
-      // si fue éxito directo lo apagamos aquí
       if(this.cargando) this.cargando = false; 
     }
   }
 
-  // Fallback por si la búsqueda estricta falla
   async buscarDireccionGlobal(query: string) {
      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=bo&limit=1`;
      const response = await fetch(url);

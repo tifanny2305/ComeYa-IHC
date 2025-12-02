@@ -31,7 +31,7 @@ export class CarritoService {
       } else {
         return [
           ...itemsActuales, 
-          { producto, cantidad: 1, observacion: '' } // Se agrega 'observacion' con valor predeterminado
+          { producto, cantidad: 1, observacion: '' }
         ];
       }
     });

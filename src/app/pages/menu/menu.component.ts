@@ -44,14 +44,14 @@ export class MenuComponent implements OnInit {
 
       if (chatId) {
         localStorage.setItem('chat_id', chatId);
-        this.displayChatId.set(chatId); // <--- ACTUALIZAR EL SIGNAL
+        this.displayChatId.set(chatId);
       } else {
         this.displayChatId.set('ID No Encontrado');
       }
       
       if (nombreUsuario) {
         localStorage.setItem('nombre_usuario', nombreUsuario);
-        this.displayNombreUsuario.set(nombreUsuario); // <--- ACTUALIZAR EL SIGNAL
+        this.displayNombreUsuario.set(nombreUsuario);
       } else {
         this.displayNombreUsuario.set('Nombre No Encontrado');
       }

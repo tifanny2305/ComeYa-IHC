@@ -6,11 +6,11 @@ import { VerificadoComponent } from './pages/verificado/verificado.component';
 import { MapaComponent } from './pages/mapa/mapa.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'menu', pathMatch: 'full' }, // Redirige al menú al entrar
+  { path: '', redirectTo: 'menu', pathMatch: 'full' },
   { path: 'menu', component: MenuComponent },
   { path: 'resumen', component: ResumenComponent },
   { path: 'pago', component: PagoComponent },
   { path: 'verificado', component: VerificadoComponent },
   { path: 'mapa', component: MapaComponent },
-  { path: '**', redirectTo: 'menu' } // Si escriben cualquier cosa rara, vuelve al menú
+  { path: '**', redirectTo: 'menu' }
 ];
