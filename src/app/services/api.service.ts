@@ -15,7 +15,9 @@ interface DetalleInput {
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private apiUrl = '/api'; 
+  //private apiUrl = '/api'; 
+  private apiUrl = 'https://14c99415aa88.ngrok-free.app'; 
+
 
   // --- MENÚ ---
   getCategorias(): Observable<any[]> {
